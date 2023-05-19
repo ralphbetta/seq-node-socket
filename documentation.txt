@@ -1,1 +1,8 @@
 npm install express sequelize mysql2 cors dotenv express-validator jsonwebtoken bcrypt socket.io --save
+
+
+### Here's an example of how you can create and run a migration using Sequelize CLI:
+>> sudo npm install -g sequelize-cli
+>> sequelize migration:create --name=add_ip_address_column
+>> sequelize init
+>> sequelize db:migrate

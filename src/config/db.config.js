@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const enviromentalConfig = {
     development: {
         HOST: "127.0.0.1",
