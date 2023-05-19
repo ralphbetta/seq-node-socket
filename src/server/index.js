@@ -48,20 +48,23 @@ class Server {
         indexRoute(app).register();
         // app.use('/api/', globalRoute);
 
-        /*--------------------------------- SOCKET CONFIGURATION START ---------------------------------------*/
-        const http = require('http');
-        const socketIO = require('socket.io');
-        const server = http.createServer(app);
-        const io = socketIO(server);
-
-        SocketService.initialize(io, app);
-
-        /*--------------------------------- SOCKET CONFIGURATION END ---------------------------------------*/
         // set port, listen for requests
         const PORT = process.env.PORT || 8080;
-        app.listen(PORT, () => {
-            console.log(`Server is running 127.0.0.1:${PORT}.`);
+
+        const server = app.listen(PORT, () => {
+            console.log(`Server is running http://127.0.0.1:${PORT}`);
         });
+
+
+
+        /*--------------------------------- SOCKET CONFIGURATION START ---------------------------------------*/
+
+        // Socket setup
+        
+
+       SocketService.initialize(server, app);
+
+        /*--------------------------------- SOCKET CONFIGURATION END ---------------------------------------*/
 
 
     }
