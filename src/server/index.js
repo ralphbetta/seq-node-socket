@@ -4,6 +4,7 @@ require('dotenv').config();
 const app = express();
 const globalRoute = require('../routes/api.routes');
 const indexRoute = require('../routes/');
+const SocketService = require("../utills/socket.service");
 
 
 class Server {
@@ -45,7 +46,6 @@ class Server {
 
         // Register App Routes
         indexRoute(app).register();
-
         // app.use('/api/', globalRoute);
 
         /*--------------------------------- SOCKET CONFIGURATION START ---------------------------------------*/
@@ -54,30 +54,7 @@ class Server {
         const server = http.createServer(app);
         const io = socketIO(server);
 
-        // Add Socket.IO functionality
-        app.set('io', io);
-
-        // Add Socket.IO functionality
-        io.on('connection', (socket) => {
-            console.log('New client connected');
-
-            // Join a room
-            socket.on('joinRoom', (roomId) => {
-                socket.join(roomId);
-            });
-
-            // Handle 'message' event
-            socket.on('message', (data) => {
-                const { roomId, message } = data;
-                // Emit the received message to all clients in the room
-                io.to(roomId).emit('message', message);
-            });
-
-            // Handle 'disconnect' event
-            socket.on('disconnect', () => {
-                console.log('Client disconnected');
-            });
-        });
+        SocketService.initialize(io, app);
 
         /*--------------------------------- SOCKET CONFIGURATION END ---------------------------------------*/
         // set port, listen for requests
