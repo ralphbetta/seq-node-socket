@@ -175,6 +175,7 @@ class UserController {
             user_id: user.id,
             client_id: req.headers['user-agent'],
             token: token,
+            ip_addess: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
             expires_at: expiry.toISOString().slice(0, 19).replace('T', ' ')
         });
     }
