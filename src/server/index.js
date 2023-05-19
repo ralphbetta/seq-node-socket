@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 require('dotenv').config();
 const app = express();
+const globalRoute = require('../routes/api.routes')
 
 
 class Server {
@@ -39,6 +40,8 @@ class Server {
         app.get("/", (req, res) => {
             res.json({ message: "Welcome to Node App" });
         });
+
+        app.use('/api/', globalRoute);
 
 
         // set port, listen for requests

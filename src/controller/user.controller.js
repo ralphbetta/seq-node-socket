@@ -1,4 +1,4 @@
-const { User, AccessToken } = require("../databse/model/index");
+const { User } = require("../model/database");
 const { validationResult } = require('express-validator');
 const bcrypt = require('bcrypt');
 const {generateToken} = require('../middleware/jwt.middleware')
