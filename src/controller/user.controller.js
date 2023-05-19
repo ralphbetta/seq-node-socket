@@ -1,7 +1,7 @@
-const { User } = require("../model/database");
+const { User, AccessToken } = require("../model/database");
 const { validationResult } = require('express-validator');
 const bcrypt = require('bcrypt');
-const {generateToken} = require('../middleware/jwt.middleware')
+const TokenService = require('../middleware/jwt.middleware')
 
 class UserController {
 
@@ -110,8 +110,6 @@ class UserController {
 
     const { username, email, password } = req.body;
 
-    // console.log(`this is user header: ${req.headers['user-agent']}`);
-
     User.findOne({ where: { email: email } })
       .then((user) => {
         if (!user) {
@@ -130,19 +128,19 @@ class UserController {
           if (match) {
           
 
-            res.cookie("refreshToken", generateToken(userData), {
+            res.cookie("refreshToken", TokenService.generateToken(userData), {
               httpOnly: true,
               maxAge: 72 * 60 * 60 * 1000,
             });
 
              //---------- For Refresh Token---------------------
-            user.token = generateToken(userData);
+            user.token = TokenService.generateToken(userData);
             user.save();
 
-            UserController.saveToken(user, generateToken(userData), req);
+            UserController.saveToken(user, TokenService.generateToken(userData), req);
 
             //--------------------------------------------------
-            return res.status(200).json({error: false, message: 'User found', data: userData, token: generateToken(userData) });
+            return res.status(200).json({error: false, message: 'User found', data: userData, token: TokenService.generateToken(userData) });
           } else {
             return res.status(404).json({ error: true, message: 'Email and Password does not match' });
           }
