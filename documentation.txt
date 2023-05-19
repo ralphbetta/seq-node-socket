@@ -1,0 +1,1 @@
+npm install express sequelize mysql2 cors dotenv express-validator jsonwebtoken bcrypt socket.io --save
