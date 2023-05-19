@@ -26,7 +26,6 @@ class Server {
         const { db } = require("../model/database/index");
 
         //Sync Database Models
-        //In development, you may need to drop existing tables and re-sync database. Just use
         //{ force: true }
         db.sequelize.sync()
             .then(() => {
@@ -42,14 +41,45 @@ class Server {
             res.json({ message: "Welcome to Node App" });
         });
 
-        
+
 
         // Register App Routes
         indexRoute(app).register();
 
         // app.use('/api/', globalRoute);
 
+        /*--------------------------------- SOCKET CONFIGURATION START ---------------------------------------*/
+        const http = require('http');
+        const socketIO = require('socket.io');
+        const server = http.createServer(app);
+        const io = socketIO(server);
 
+        // Add Socket.IO functionality
+        app.set('io', io);
+
+        // Add Socket.IO functionality
+        io.on('connection', (socket) => {
+            console.log('New client connected');
+
+            // Join a room
+            socket.on('joinRoom', (roomId) => {
+                socket.join(roomId);
+            });
+
+            // Handle 'message' event
+            socket.on('message', (data) => {
+                const { roomId, message } = data;
+                // Emit the received message to all clients in the room
+                io.to(roomId).emit('message', message);
+            });
+
+            // Handle 'disconnect' event
+            socket.on('disconnect', () => {
+                console.log('Client disconnected');
+            });
+        });
+
+        /*--------------------------------- SOCKET CONFIGURATION END ---------------------------------------*/
         // set port, listen for requests
         const PORT = process.env.PORT || 8080;
         app.listen(PORT, () => {

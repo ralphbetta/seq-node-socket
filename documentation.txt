@@ -1,4 +1,4 @@
-npm install express sequelize mysql2 cors dotenv express-validator jsonwebtoken bcrypt socket.io --save
+npm install express sequelize mysql2 cors dotenv express-validator jsonwebtoken bcrypt socket.io nodemailer --save
 
 
 ### Here's an example of how you can create and run a migration using Sequelize CLI:

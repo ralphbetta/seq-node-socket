@@ -1,7 +1,8 @@
 const { User, AccessToken } = require("../model/database");
 const { validationResult } = require('express-validator');
 const bcrypt = require('bcrypt');
-const TokenService = require('../middleware/jwt.middleware')
+const TokenService = require('../middleware/jwt.middleware');
+const EmailService = require("../utills/email.service");
 
 class UserController {
 
@@ -47,15 +48,22 @@ class UserController {
       return res.status(400).json({ errors: errors.array() });
     }
     const { username, email, password } = req.body;
+    
+    UserController.sendOTP(req);
 
-    User.create({ username, email, password })
-      .then((user) => {
-        res.status(201).json(user);
-      })
-      .catch((error) => {
-        console.error(error);
-        res.status(500).json({ error: 'Server Error' });
-      });
+
+    // User.create({ username, email, password })
+    //   .then((user) => {
+
+    //     /*------- Validate Response ----------------*/
+    //     UserController.sendOTP(req);
+
+    //     res.status(201).json(user);
+    //   })
+    //   .catch((error) => {
+    //     console.error(error);
+    //     res.status(500).json({ error: 'Server Error' });
+    //   });
 
   }
 
@@ -126,21 +134,21 @@ class UserController {
 
         bcrypt.compare(req.body.password, user.password).then((match) => {
           if (match) {
-          
+
 
             res.cookie("refreshToken", TokenService.generateToken(userData), {
               httpOnly: true,
               maxAge: 72 * 60 * 60 * 1000,
             });
 
-             //---------- For Refresh Token---------------------
+            //---------- For Refresh Token---------------------
             user.token = TokenService.generateToken(userData);
             user.save();
 
             UserController.saveToken(user, TokenService.generateToken(userData), req);
 
             //--------------------------------------------------
-            return res.status(200).json({error: false, message: 'User found', data: userData, token: TokenService.generateToken(userData) });
+            return res.status(200).json({ error: false, message: 'User found', data: userData, token: TokenService.generateToken(userData) });
           } else {
             return res.status(404).json({ error: true, message: 'Email and Password does not match' });
           }
@@ -148,7 +156,7 @@ class UserController {
         });
       })
       .catch((error) => {
-        res.status(500).json({ error: 'Server Error' ,message: error });
+        res.status(500).json({ error: 'Server Error', message: error });
       });
   };
 
@@ -159,27 +167,42 @@ class UserController {
     expiry.setDate(expiry.getDate() + 2);
 
     var previousToken = await AccessToken.findOne({
-        where: {
-            user_id: user.id,
-            client_id: req.headers['user-agent']
-        }
+      where: {
+        user_id: user.id,
+        client_id: req.headers['user-agent']
+      }
     });
 
     if (previousToken) {
-        await AccessToken.update({
-            token: token,
-            expires_at: expiry.toISOString().slice(0, 19).replace('T', ' ')
-        }, { where: { user_id: user.id, client_id: req.headers['user-agent'] } });
+      await AccessToken.update({
+        token: token,
+        expires_at: expiry.toISOString().slice(0, 19).replace('T', ' ')
+      }, { where: { user_id: user.id, client_id: req.headers['user-agent'] } });
     } else {
-        await AccessToken.create({
-            user_id: user.id,
-            client_id: req.headers['user-agent'],
-            token: token,
-            ip_addess: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
-            expires_at: expiry.toISOString().slice(0, 19).replace('T', ' ')
-        });
+      await AccessToken.create({
+        user_id: user.id,
+        client_id: req.headers['user-agent'],
+        token: token,
+        ip_addess: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
+        expires_at: expiry.toISOString().slice(0, 19).replace('T', ' ')
+      });
     }
-}
+  }
+
+  static async sendOTP(req) {
+
+    const token = "NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyZGF0YSI6eyJlbWFpbCI6InVzZXI";
+    const link = `http://localhost:5000/${token}`;
+    const body = `Hi, Please follow this link to reset your password. this link will be valid till 10 minutes <a href='${link}'>Clickhere</a>`;
+    const mailOptions = {
+      from: 'info@bitminingoptions.com',
+      to: req.body.email,
+      subject: 'Confirm OTP',
+      html: body,
+    };
+
+    EmailService.sendEmail(mailOptions);
+  }
 
 
   static deleteUser(req, res) {
@@ -198,6 +221,9 @@ class UserController {
         return res.status(500).json({ error: 'Server Error' });
       });
   }
+
+
+
 }
 
 module.exports = UserController;
