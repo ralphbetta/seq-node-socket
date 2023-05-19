@@ -12,6 +12,7 @@ const UserController = require('../controller/user.controller');
 
 /* ------------------------------- ACCOUNT ROUTERS ------------------------------- */
 router.get('/account', UserController.getAllUsers);
+router.post('/account', UserController.createUser);
 
 
 module.exports = router;
