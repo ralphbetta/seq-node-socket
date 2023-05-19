@@ -24,4 +24,4 @@ db.sequelize = sequelize;
  const User = db.tutorials = require("../user.model")(sequelize, Sequelize);
 // const AccessToken = db.tutorials = require("./accessToken.model.js")(sequelize, Sequelize);
 
-module.exports = {db};
+module.exports = {db, User};
