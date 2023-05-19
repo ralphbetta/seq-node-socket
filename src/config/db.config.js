@@ -2,10 +2,10 @@ require('dotenv').config();
 
 const enviromentalConfig = {
     development: {
-        HOST: "127.0.0.1",
-        USER: "root",
-        PASSWORD: "",
-        DB: "testdb",
+        HOST: process.env.DATABASE_HOST,
+        USER: process.env.DATABASE_USER,
+        PASSWORD: process.env.DATABASE_PASSWORD,
+        DB: process.env.DATABASE_DB,
         dialect: "mysql",
         pool: {
             max: 5,
@@ -15,10 +15,10 @@ const enviromentalConfig = {
         }
     },
     test: {
-        HOST: "127.0.0.1",
-        USER: "root",
-        PASSWORD: "",
-        DB: "testdb",
+        HOST: process.env.DATABASE_HOST,
+        USER: process.env.DATABASE_USER,
+        PASSWORD: process.env.DATABASE_PASSWORD,
+        DB: process.env.DATABASE_DB,
         dialect: "mysql",
         pool: {
             max: 5,
@@ -28,10 +28,10 @@ const enviromentalConfig = {
         }
     },
     production: {
-        HOST: "127.0.0.1",
-        USER: "root",
-        PASSWORD: "xyz",
-        DB: "testdb",
+        HOST: process.env.DATABASE_HOST,
+        USER: process.env.DATABASE_USER,
+        PASSWORD: process.env.DATABASE_PASSWORD,
+        DB: process.env.DATABASE_DB,
         dialect: "mysql",
         pool: {
             max: 5,
