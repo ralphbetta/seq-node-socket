@@ -6,3 +6,6 @@ npm install express sequelize mysql2 cors dotenv express-validator jsonwebtoken 
 >> sequelize migration:create --name=add_ip_address_column
 >> sequelize init
 >> sequelize db:migrate
+----------------  TO SEED DATA    -----------------
+>> sequelize seed:generate --name=seed_column_data
+>> sequelize db:seed:all

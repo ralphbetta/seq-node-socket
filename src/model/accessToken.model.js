@@ -1,5 +1,5 @@
 module.exports = (sequelize, Sequelize) => {
-    const AccessToken = sequelize.define("accessToken", {
+    const AccessToken = sequelize.define("AccessToken", {
         user_id: {
             type: Sequelize.INTEGER,
             allowNull: false
@@ -9,7 +9,8 @@ module.exports = (sequelize, Sequelize) => {
             allowNull: false
         },
         token: {
-            type: Sequelize.STRING(10000),
+            
+            type: Sequelize.STRING(255),
             unique: true,
             allowNull: false
         },
