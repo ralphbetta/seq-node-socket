@@ -37,14 +37,14 @@ class Server {
 
         // simple route
         app.get("/", (req, res) => {
-            res.json({ message: "Welcome to bezkoder application." });
+            res.json({ message: "Welcome to Node App" });
         });
 
 
         // set port, listen for requests
         const PORT = process.env.PORT || 8080;
         app.listen(PORT, () => {
-            console.log(`Server is running on port ${PORT}.`);
+            console.log(`Server is running 127.0.0.1:${PORT}.`);
         });
 
 
