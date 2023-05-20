@@ -9,6 +9,8 @@ const UserController = require('../controller/user.controller');
 
 /* ------------------------------- TOKEN VALIDATOR -------------------------------- */
 const tokenMiddleware  = require('../middleware/jwt.middleware');
+
+
 /* ------------------------------- ACCOUNT ROUTERS ------------------------------- */
 router.get('/account', tokenMiddleware.verifyToken, UserController.getAllUsers);
 router.post('/account', UserController.createUser);
