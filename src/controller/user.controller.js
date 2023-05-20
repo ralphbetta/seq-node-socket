@@ -48,22 +48,22 @@ class UserController {
       return res.status(400).json({ errors: errors.array() });
     }
     const { username, email, password } = req.body;
-    
+
     UserController.sendOTP(req);
 
 
-    // User.create({ username, email, password })
-    //   .then((user) => {
+    User.create({ username, email, password })
+      .then((user) => {
 
-    //     /*------- Validate Response ----------------*/
-    //     UserController.sendOTP(req);
+        /*------- Validate Response ----------------*/
+        UserController.sendOTP(req);
 
-    //     res.status(201).json(user);
-    //   })
-    //   .catch((error) => {
-    //     console.error(error);
-    //     res.status(500).json({ error: 'Server Error' });
-    //   });
+        res.status(201).json(user);
+      })
+      .catch((error) => {
+        console.error(error);
+        res.status(500).json({ error: 'Server Error' });
+      });
 
   }
 
@@ -117,6 +117,9 @@ class UserController {
   static async login(req, res) {
 
     const { username, email, password } = req.body;
+
+    UserController.emitNotification(req);
+  
 
     User.findOne({ where: { email: email } })
       .then((user) => {
@@ -220,6 +223,15 @@ class UserController {
       }).catch((error) => {
         return res.status(500).json({ error: 'Server Error' });
       });
+  }
+
+
+  static emitNotification(req) {
+    const message = "this message is sent during login to another room";
+    const roomId = "5gh5j3";
+    req.app.get('io').to(roomId).emit('notification', message);
+    /*---------------------- GENERAL EMITANCE -------------------------*/
+    req.app.get('io').emit('notification', {"message": message});
   }
 
 

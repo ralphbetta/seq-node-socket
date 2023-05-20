@@ -3,7 +3,7 @@ const cors = require("cors");
 require('dotenv').config();
 const app = express();
 const globalRoute = require('../routes/api.routes');
-const indexRoute = require('../routes/');
+const IndexRoute = require('../routes/');
 const SocketService = require("../utills/socket.service");
 
 
@@ -37,35 +37,22 @@ class Server {
             });
 
 
-        // simple route
-        app.get("/", (req, res) => {
-            res.json({ message: "Welcome to Node App" });
-        });
+        /*----------- DEFAULT ROUTE ----------------*/
+        app.get("/", (req, res) => {res.json({ message: "Welcome to Node App" })});
 
 
-
-        // Register App Routes
-        indexRoute(app).register();
+         /*----------- DEFAULT ROUTE ----------------*/
+        IndexRoute(app).register();
         // app.use('/api/', globalRoute);
 
-        // set port, listen for requests
         const PORT = process.env.PORT || 8080;
-
+        
         const server = app.listen(PORT, () => {
             console.log(`Server is running http://127.0.0.1:${PORT}`);
+           /*----------- SOCKET CONFIGURATION START ----------------*/
+
+           SocketService.initialize(server, app);
         });
-
-
-
-        /*--------------------------------- SOCKET CONFIGURATION START ---------------------------------------*/
-
-        // Socket setup
-        
-
-       SocketService.initialize(server, app);
-
-        /*--------------------------------- SOCKET CONFIGURATION END ---------------------------------------*/
-
 
     }
 
