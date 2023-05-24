@@ -36,6 +36,9 @@ class Server {
                 console.log("Failed to sync db: " + err.message);
             });
 
+        
+        app.use('/Images', express.static('./Images'))
+
 
         /*----------- DEFAULT ROUTE ----------------*/
         app.get("/", (req, res) => {res.json({ message: "Welcome to Node App" })});
