@@ -30,31 +30,54 @@ const Permission = db.permissions = require("../permision.model")(sequelize, Seq
 const Role = db.roles = require("../roles.model")(sequelize, Sequelize);
 
 
+const Student = db.students = require("../student.temp.model")(sequelize, Sequelize);
+const Class = db.classes = require("../class.temp.model")(sequelize, Sequelize);
+const Enrollment = db.enrollments = require("../enrollment.temp.model")(sequelize, Sequelize);
+
 // 1 to Many Relation
+
+// --------------------// Define the associations //-----------------------
 
 db.products.hasMany(db.reviews, {foreignKey: 'product_id', as: 'review'});
 db.reviews.belongsTo(db.products, {foreignKey: 'product_id', as: 'product'});
 
+//-------------------- User Role Permission ----------------
 
-// Define the associations 
 User.belongsToMany(Role, { through: 'UserRole' });
 Role.belongsToMany(User, { through: 'UserRole' });
 Role.belongsToMany(Permission, { through: 'RolePermission' });
 Permission.belongsToMany(Role, { through: 'RolePermission' });
 
+//-------------------- Class Student Enrollment ----------------
+Student.belongsToMany(Class, { through: Enrollment });
+Class.belongsToMany(Student, { through: Enrollment });
+
+
+
+// -------------ONE TO ONE------------
+// Person.hasOne(models.House);
+// House.belongsTo(models.Person);
+
+
+
 // User.hasMany(Order, { foreignKey: 'userId',  as: 'user_order' });
 // Order.belongsTo(User, { foreignKey: 'userId' });
 
-//chatGTP
-//used
-//User.hasMany(Order, { foreignKey: 'userId' });
-//Order.belongsTo(User, { foreignKey: 'userId' });
-
-//Order.belongsToMany(Product, { through: 'OrderProduct' });
-//Product.belongsToMany(Order, { through: 'OrderProduct' });
 
 // Order.hasOne(Payment, { foreignKey: 'orderId' });
 // Payment.belongsTo(Order, { foreignKey: 'orderId' });
 
 
-module.exports = {db, User, AccessToken, Message, Product, Review, Permission, Role};
+module.exports = {
+  db,
+  User,
+  AccessToken,
+  Message,
+  Product,
+  Review,
+  Permission,
+  Role,
+  Student, 
+  Class, 
+  Enrollment
+};
