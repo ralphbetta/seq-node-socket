@@ -9,3 +9,4 @@ npm install express sequelize mysql2 cors dotenv express-validator jsonwebtoken 
 ----------------  TO SEED DATA    -----------------
 >> sequelize seed:generate --name=seed_column_data
 >> sequelize db:seed:all
+>> node seeders/index.js

@@ -16,24 +16,7 @@ const permissions = [
   { name: 'viewUser' },
 ];
 
-
-
-
-
 const superAdmin =  {username: "xavi", email : "gxaviprank@gmail.com", password: "1234"};
-
-
-// const seed = async () => {
-//   try {
-//     await Role.bulkCreate(roles);
-//     await Permission.bulkCreate(permissions);
-//     console.log('Database seeded successfully!');
-//   } catch (error) {
-//     console.error('Error seeding database:', error);
-//   } finally {
-//     process.exit();
-//   }
-// };
 
 const seed = async()=>{
 Role.bulkCreate(roles).then(()=>{

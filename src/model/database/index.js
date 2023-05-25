@@ -57,6 +57,9 @@ Class.belongsToMany(Student, { through: Enrollment });
 // -------------ONE TO ONE------------
 // Person.hasOne(models.House);
 // House.belongsTo(models.Person);
+// or
+// Address.belongsTo(Customers, {foreignKey: 'fk_customerid', targetKey: 'uuid'});
+// Customers.hasOne(Address, {foreignKey: 'fk_customerid', targetKey: 'uuid'});
 
 
 

@@ -61,6 +61,28 @@ class UserController {
 
   }
 
+
+  static getRelationalUserFileter = async(req, res) => {
+    const { id } = req.params;
+    const data = await User.findAll({
+
+      attributes: { exclude: ['updatedAt', 'createdAt', 'token'], include: '' },
+      include: [
+        {
+          model: Role,
+          //attributes: ['RoleId', 'phone']
+
+        }
+      ]
+    });
+
+
+    res.status(200).json({ data: data });
+
+    console.log(data);
+
+  }
+
   static createUser(req, res) {
     validationResult(req);
     /*--------------------- Validate Response ----------------*/
