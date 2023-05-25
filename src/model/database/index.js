@@ -30,15 +30,11 @@ const Review = db.reviews = require("../review.model")(sequelize, Sequelize);
 
 // 1 to Many Relation
 
-db.products.hasMany(db.reviews, {
-  foreignKey: 'product_id',
-  as: 'review'
-})
+db.products.hasMany(db.reviews, {foreignKey: 'product_id', as: 'review'});
+db.reviews.belongsTo(db.products, {foreignKey: 'product_id', as: 'product'});
 
-db.reviews.belongsTo(db.products, {
-  foreignKey: 'product_id',
-  as: 'product'
-})
+// SalesItem.belongsTo(Item, { foreignKey: 'itemId', targetKey: 'id' });
+// Item.hasMany(SalesItem, { foreignKey: 'itemId', targetKey: 'id' });
 
 
 module.exports = {db, User, AccessToken, Message, Product, Review};

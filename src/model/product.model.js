@@ -4,6 +4,11 @@ module.exports = (sequelize, Sequelize) => {
 
 
     const Product = sequelize.define("Product", {
+        id: {
+            type: Sequelize.UUID,
+            primaryKey: true,
+            defaultValue: Sequelize.DataTypes.UUIDV4,
+        },
         image: {
             type: Sequelize.STRING
         },
@@ -20,7 +25,7 @@ module.exports = (sequelize, Sequelize) => {
         published: {
             type: Sequelize.BOOLEAN
         }
-    
+
     })
 
     return Product
