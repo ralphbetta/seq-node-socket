@@ -50,6 +50,12 @@ module.exports = (sequelize, Sequelize) => {
                     const hashedPassword = await bcrypt.hash(user.password, 10);
                     user.password = hashedPassword;
                 },
+                beforeCreate: async (user) => {
+                    console.log("hello");
+                    const hashedPassword = await bcrypt.hash(user.password, 10);
+                    user.password = hashedPassword;
+                },
+
                 beforeUpdate: async (user) => {
 
                     if (user.changed('password')) {
@@ -69,6 +75,13 @@ module.exports = (sequelize, Sequelize) => {
 
     User.beforeSave((user) => {
         // Perform any required actions before updating the user
+    });
+
+    User.beforeBulkCreate( async (users, options) => {
+        for (const user of users) {
+            const hashedPassword = await bcrypt.hash(user.password, 10);
+            user.password = hashedPassword;
+        }
     });
 
     // This will ensure the beforeUpdate hook is registered
