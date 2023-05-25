@@ -14,6 +14,8 @@ const tokenMiddleware  = require('../middleware/jwt.middleware');
 
 /* ------------------------------- ACCOUNT ROUTERS ------------------------------- */
 router.get('/account', tokenMiddleware.verifyToken, UserController.getAllUsers);
+router.get('/account/roles/:id', tokenMiddleware.verifyToken, UserController.getRelationalUserById);
+router.get('/account/:id', tokenMiddleware.verifyToken, UserController.getUserById);
 router.post('/account', UserController.createUser);
 router.post('/account/login', UserController.login);
 

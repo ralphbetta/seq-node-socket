@@ -1,4 +1,4 @@
-const { User, AccessToken } = require("../model/database");
+const { User, AccessToken, Permission, Role } = require("../model/database");
 const { validationResult } = require('express-validator');
 const bcrypt = require('bcrypt');
 const TokenService = require('../middleware/jwt.middleware');
@@ -7,7 +7,8 @@ const EmailService = require("../utills/email.service");
 class UserController {
 
   static getAllUsers(req, res) {
-    User.findAll({ attributes: { exclude: ['password'] } })
+   
+    User.findAll({ attributes: { exclude: ['password'], include: '' } })
       .then((users) => {
 
         users = users.sort((a, b) => b.createdAt - a.createdAt);
@@ -27,8 +28,12 @@ class UserController {
   static getUserById(req, res) {
     const { id } = req.params;
 
-    User.findByPk(id, { attributes: { exclude: ['', 'createdAt'] } })
+    
+    User.findByPk(id, { attributes: { exclude: ['', 'createdAt'], include: '' } })
       .then((user) => {
+
+        console.log(user);
+
         if (!user) {
           return res.status(404).json({ error: 'User not found' });
         }
@@ -38,6 +43,22 @@ class UserController {
         console.error(error);
         res.status(500).json({ error: 'Server Error' });
       });
+  }
+
+  static getRelationalUserById = async(req, res) => {
+    const { id } = req.params;
+    const data = await User.findOne({
+
+      attributes: { exclude: ['updatedAt', 'createdAt', 'token'], include: '' },
+      where: { id: id },
+      include: Role
+    });
+
+
+    res.status(200).json({ data: data });
+
+    console.log(data);
+
   }
 
   static createUser(req, res) {
