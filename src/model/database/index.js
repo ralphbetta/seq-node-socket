@@ -26,6 +26,8 @@ const AccessToken = db.accesstokens = require("../accessToken.model")(sequelize,
 const Message = db.messages = require("../message.model")(sequelize, Sequelize);
 const Product = db.products = require("../product.model")(sequelize, Sequelize);
 const Review = db.reviews = require("../review.model")(sequelize, Sequelize);
+const Permission = db.permissions = require("../permision.model")(sequelize, Sequelize);
+const Role = db.roles = require("../roles.model")(sequelize, Sequelize);
 
 
 // 1 to Many Relation
@@ -33,8 +35,26 @@ const Review = db.reviews = require("../review.model")(sequelize, Sequelize);
 db.products.hasMany(db.reviews, {foreignKey: 'product_id', as: 'review'});
 db.reviews.belongsTo(db.products, {foreignKey: 'product_id', as: 'product'});
 
-// SalesItem.belongsTo(Item, { foreignKey: 'itemId', targetKey: 'id' });
-// Item.hasMany(SalesItem, { foreignKey: 'itemId', targetKey: 'id' });
+
+// Define the associations 
+User.belongsToMany(Role, { through: 'UserRole' });
+Role.belongsToMany(User, { through: 'UserRole' });
+Role.belongsToMany(Permission, { through: 'RolePermission' });
+Permission.belongsToMany(Role, { through: 'RolePermission' });
+
+// User.hasMany(Order, { foreignKey: 'userId',  as: 'user_order' });
+// Order.belongsTo(User, { foreignKey: 'userId' });
+
+//chatGTP
+//used
+//User.hasMany(Order, { foreignKey: 'userId' });
+//Order.belongsTo(User, { foreignKey: 'userId' });
+
+//Order.belongsToMany(Product, { through: 'OrderProduct' });
+//Product.belongsToMany(Order, { through: 'OrderProduct' });
+
+// Order.hasOne(Payment, { foreignKey: 'orderId' });
+// Payment.belongsTo(Order, { foreignKey: 'orderId' });
 
 
-module.exports = {db, User, AccessToken, Message, Product, Review};
+module.exports = {db, User, AccessToken, Message, Product, Review, Permission, Role};
