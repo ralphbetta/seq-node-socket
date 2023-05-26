@@ -33,6 +33,7 @@ const Role = db.roles = require("../roles.model")(sequelize, Sequelize);
 const Student = db.students = require("../student.temp.model")(sequelize, Sequelize);
 const Class = db.classes = require("../class.temp.model")(sequelize, Sequelize);
 const Enrollment = db.enrollments = require("../enrollment.temp.model")(sequelize, Sequelize);
+const Profile = db.profiles = require("../profile.model")(sequelize, Sequelize);
 
 // 1 to Many Relation
 
@@ -43,26 +44,32 @@ db.reviews.belongsTo(db.products, {foreignKey: 'product_id', as: 'product'});
 
 //-------------------- User Role Permission ----------------
 
-User.belongsToMany(Role, { through: 'UserRole' });
-Role.belongsToMany(User, { through: 'UserRole' });
-Role.belongsToMany(Permission, { through: 'RolePermission' });
-Permission.belongsToMany(Role, { through: 'RolePermission' });
+User.belongsToMany(Role, { through: 'UserRole' }); //not valid
+Role.belongsToMany(User, { through: 'UserRole' });  //each role can belongs to any user so userAdd(Role)
+Role.belongsToMany(Permission, { through: 'RolePermission' }); //this is a wrong
+Permission.belongsToMany(Role, { through: 'RolePermission' }); //each or all permissions can belongs to any user so userAdd(Role)
 
 //-------------------- Class Student Enrollment ----------------
 Student.belongsToMany(Class, { through: Enrollment });
-Class.belongsToMany(Student, { through: Enrollment });
+Class.belongsToMany(Student, { through: Enrollment }); //
 
 
 
-// -------------ONE TO ONE------------
-// Person.hasOne(models.House);
-// House.belongsTo(models.Person);
+// -------------ONE TO ONE------------// Replace Access Token
+User.hasOne(Profile, {allowNull: false});
+Profile.belongsTo(User, {allowNull: false}); //each profile belongs one user so userSet(Profile)
+
+// User.hasOne(Profile,{foreignKey: 'userId'});
+// Profile.belongsTo(User, {foreignKey: 'userId'});
+
+
+
 // or
 // Address.belongsTo(Customers, {foreignKey: 'fk_customerid', targetKey: 'uuid'});
 // Customers.hasOne(Address, {foreignKey: 'fk_customerid', targetKey: 'uuid'});
 
 
-
+//this is next
 // User.hasMany(Order, { foreignKey: 'userId',  as: 'user_order' });
 // Order.belongsTo(User, { foreignKey: 'userId' });
 
@@ -74,6 +81,7 @@ Class.belongsToMany(Student, { through: Enrollment });
 module.exports = {
   db,
   User,
+  Profile,
   AccessToken,
   Message,
   Product,

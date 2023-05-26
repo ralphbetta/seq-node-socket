@@ -1,4 +1,4 @@
-const { User, AccessToken, Permission, Role } = require("../model/database");
+const { User, AccessToken, Permission, Role, Profile} = require("../model/database");
 const { validationResult } = require('express-validator');
 const bcrypt = require('bcrypt');
 const TokenService = require('../middleware/jwt.middleware');
@@ -64,24 +64,59 @@ class UserController {
 
   static getRelationalUserFileter = async(req, res) => {
     const { id } = req.params;
+
+
     const data = await User.findAll({
 
-      attributes: { exclude: ['updatedAt', 'createdAt', 'token'], include: '' },
+      attributes: { exclude: ['updatedAt', 'createdAt', 'token']},
       include: [
         {
+          attributes: { exclude: ['id','UserRole'] },
           model: Role,
-          //attributes: ['RoleId', 'phone']
-
+          required: false, // Use `required: false` to perform a LEFT JOIN
+          // include: {
+          //   model: Permission,
+          //   attributes: { exclude: ['updatedAt', 'createdAt', 'id', 'RolePermission']},
+          // },
+        },
+        {
+          attributes: { exclude: ['updatedAt', 'createdAt', 'id'] },
+          model: Profile,
+          required: false
         }
-      ]
+      ],
+      //raw: true,
     });
+
+
 
 
     res.status(200).json({ data: data });
 
-    console.log(data);
 
   }
+
+  static getAllRelationalRoles = async(req, res)=>{
+    const { id } = req.params;
+    const data = await Role.findAll({
+      include: [
+        {
+          model: Permission,
+         
+          required: false // Use `required: false` to perform a LEFT JOIN
+        },
+        {
+          model: User,
+          attributes: { exclude: ['RolePermission'] },
+          required: false // Use `required: false` to perform a LEFT JOIN
+        },
+      ]
+    });
+
+    res.status(200).json({ data: data });
+    
+  }
+
 
   static createUser(req, res) {
     validationResult(req);
@@ -178,7 +213,12 @@ class UserController {
           type: user.account_type,
         };
 
-        bcrypt.compare(req.body.password, user.password).then((match) => {
+        
+        //since we're preventing password from returning
+        //bcrypt.compare(req.body.password, user.password).then((match) => {
+
+         user.comparePassword(req.body.password).then((match)=>{
+
           if (match) {
 
 
@@ -188,10 +228,15 @@ class UserController {
             });
 
             //---------- For Refresh Token---------------------
+
+            const xyz =  TokenService.generateToken(userData);
+
+            console.log(xyz);
+
             user.token = TokenService.generateToken(userData);
             user.save();
 
-            UserController.saveToken(user, TokenService.generateToken(userData), req);
+           UserController.saveToken(user, TokenService.generateToken(userData), req);
 
             //--------------------------------------------------
             return res.status(200).json({ error: false, message: 'User found', data: userData, token: TokenService.generateToken(userData) });
@@ -200,6 +245,8 @@ class UserController {
           }
 
         });
+
+
       })
       .catch((error) => {
         res.status(500).json({ error: 'Server Error', message: error });

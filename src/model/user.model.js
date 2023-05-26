@@ -40,7 +40,7 @@ module.exports = (sequelize, Sequelize) => {
             defaultValue: Sequelize.NOW
         },
         token: {
-            type: Sequelize.STRING,
+            type: Sequelize.STRING(1000),
         }
     },
         {
@@ -64,12 +64,16 @@ module.exports = (sequelize, Sequelize) => {
                     }
                 },
             },
-            scopes: {
-                findAll: {
-                    attributes: { exclude: ['password'] },
-                },
-            },
-        }
+
+            // Exclude fields from being returned in the model
+            defaultScope: {
+                attributes: {
+                    exclude: ['password', 'createdAt', 'updatedAt']
+                }
+            }
+
+        },
+
 
     );
 
@@ -77,12 +81,18 @@ module.exports = (sequelize, Sequelize) => {
         // Perform any required actions before updating the user
     });
 
-    User.beforeBulkCreate( async (users, options) => {
+    User.beforeBulkCreate(async (users, options) => {
         for (const user of users) {
             const hashedPassword = await bcrypt.hash(user.password, 10);
             user.password = hashedPassword;
         }
     });
+
+    // Instance method to compare passwords
+    User.prototype.comparePassword = async function (password) {
+        return bcrypt.compare(password, this.password);
+    };
+    
 
     // This will ensure the beforeUpdate hook is registered
     User.sync();

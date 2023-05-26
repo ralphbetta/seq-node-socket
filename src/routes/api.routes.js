@@ -12,14 +12,17 @@ const ProductController = require('../controller/product.controller');
 const tokenMiddleware  = require('../middleware/jwt.middleware');
 
 
+/* ------------------------------- ROLES ROUTES ------------------------------- */
+router.get('/account/roles', tokenMiddleware.verifyToken, UserController.getAllRelationalRoles);
+
+
 /* ------------------------------- ACCOUNT ROUTERS ------------------------------- */
 router.get('/account', tokenMiddleware.verifyToken, UserController.getAllUsers);
-router.get('/account/roles', tokenMiddleware.verifyToken, UserController.getRelationalUserFileter);
+router.get('/account/usersandroles', tokenMiddleware.verifyToken, UserController.getRelationalUserFileter);
 router.get('/account/roles/:id', tokenMiddleware.verifyToken, UserController.getRelationalUserById);
 router.get('/account/:id', tokenMiddleware.verifyToken, UserController.getUserById);
 router.post('/account', UserController.createUser);
 router.post('/account/login', UserController.login);
-
 
 /* ------------------------------- PRODUCT ROUTES ------------------------------- */
 
