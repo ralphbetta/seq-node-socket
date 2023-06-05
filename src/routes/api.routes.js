@@ -13,7 +13,14 @@ const tokenMiddleware  = require('../middleware/jwt.middleware');
 
 
 /* ------------------------------- ROLES ROUTES ------------------------------- */
-router.get('/account/roles', tokenMiddleware.verifyToken, UserController.getAllRelationalRoles);
+router.get('/roles/', UserController.getAllRoles);
+router.post('/roles/', UserController.assignRoleToUser);
+router.get('/roles/ralational', UserController.getAllRelationalRoles);
+router.get('/roles/assignedRoles/:id', UserController.getUserRoles);
+router.get('/roles/assignedUsers/:id', UserController.getUsersWithRole);
+
+
+
 
 
 /* ------------------------------- ACCOUNT ROUTERS ------------------------------- */

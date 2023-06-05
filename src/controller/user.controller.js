@@ -1,13 +1,14 @@
-const { User, AccessToken, Permission, Role, Profile} = require("../model/database");
+const { User, AccessToken, Permission, Role, Profile } = require("../model/database");
 const { validationResult } = require('express-validator');
 const bcrypt = require('bcrypt');
 const TokenService = require('../middleware/jwt.middleware');
 const EmailService = require("../utills/email.service");
+const ResponseMessage = require("../config/message.config");
 
 class UserController {
 
   static getAllUsers(req, res) {
-   
+
     User.findAll({ attributes: { exclude: ['password'], include: '' } })
       .then((users) => {
 
@@ -28,7 +29,7 @@ class UserController {
   static getUserById(req, res) {
     const { id } = req.params;
 
-    
+
     User.findByPk(id, { attributes: { exclude: ['', 'createdAt'], include: '' } })
       .then((user) => {
 
@@ -45,7 +46,7 @@ class UserController {
       });
   }
 
-  static getRelationalUserById = async(req, res) => {
+  static getRelationalUserById = async (req, res) => {
     const { id } = req.params;
     const data = await User.findOne({
 
@@ -62,16 +63,16 @@ class UserController {
   }
 
 
-  static getRelationalUserFileter = async(req, res) => {
+  static getRelationalUserFileter = async (req, res) => {
     const { id } = req.params;
 
 
     const data = await User.findAll({
 
-      attributes: { exclude: ['updatedAt', 'createdAt', 'token']},
+      attributes: { exclude: ['updatedAt', 'createdAt', 'token'] },
       include: [
         {
-          attributes: { exclude: ['id','UserRole'] },
+          attributes: { exclude: ['id', 'UserRole'] },
           model: Role,
           required: false, // Use `required: false` to perform a LEFT JOIN
           // include: {
@@ -96,13 +97,13 @@ class UserController {
 
   }
 
-  static getAllRelationalRoles = async(req, res)=>{
+  static getAllRelationalRoles = async (req, res) => {
     const { id } = req.params;
     const data = await Role.findAll({
       include: [
         {
           model: Permission,
-         
+
           required: false // Use `required: false` to perform a LEFT JOIN
         },
         {
@@ -114,7 +115,7 @@ class UserController {
     });
 
     res.status(200).json({ data: data });
-    
+
   }
 
 
@@ -197,7 +198,7 @@ class UserController {
     const { username, email, password } = req.body;
 
     UserController.emitNotification(req);
-  
+
 
     User.findOne({ where: { email: email } })
       .then((user) => {
@@ -213,11 +214,11 @@ class UserController {
           type: user.account_type,
         };
 
-        
+
         //since we're preventing password from returning
         //bcrypt.compare(req.body.password, user.password).then((match) => {
 
-         user.comparePassword(req.body.password).then((match)=>{
+        user.comparePassword(req.body.password).then((match) => {
 
           if (match) {
 
@@ -229,14 +230,14 @@ class UserController {
 
             //---------- For Refresh Token---------------------
 
-            const xyz =  TokenService.generateToken(userData);
+            const xyz = TokenService.generateToken(userData);
 
             console.log(xyz);
 
             user.token = TokenService.generateToken(userData);
             user.save();
 
-           UserController.saveToken(user, TokenService.generateToken(userData), req);
+            UserController.saveToken(user, TokenService.generateToken(userData), req);
 
             //--------------------------------------------------
             return res.status(200).json({ error: false, message: 'User found', data: userData, token: TokenService.generateToken(userData) });
@@ -321,8 +322,123 @@ class UserController {
     const roomId = "5gh5j3";
     req.app.get('io').to(roomId).emit('notification', message);
     /*---------------------- GENERAL EMITANCE -------------------------*/
-    req.app.get('io').emit('notification', {"message": message});
+    req.app.get('io').emit('notification', { "message": message });
   }
+
+
+
+
+  //=================================/ GET SPECIFIC USER ROLE /======================
+
+  static getUserRoles = async (req, res) => {
+  
+
+    try {
+      const user_id = req.params.id;
+
+      const user = await User.findByPk(user_id);
+
+      console.log(user);
+
+      if (!user) {
+        return res.status(ResponseMessage.code.not_found).json({ error: true, message: ResponseMessage.fail.bad_request, data: {} });
+      }
+      const roles = await user.getRoles();
+
+      if (!roles) {
+        return res.status(ResponseMessage.code.no_content).json({ error: false, message: ResponseMessage.fail.bad_request, data: {} });
+      }
+
+      return res.status(ResponseMessage.code.success).json({ error: false, message: ResponseMessage.pass.read, data: roles });
+
+    } catch (error) {
+      console.error('Server Error:', error);
+      return res.status(ResponseMessage.code.server_error).json({ error: true, message: ResponseMessage.pass.server_error });
+    }
+
+  }
+
+
+
+  //========================/ GET USERS WITH SPECIFIC ROLE /======================
+
+  static getUsersWithRole = async (req, res) => {
+
+    const id = req.params.id;
+
+    try {
+   
+      const role = await Role.findByPk(id);
+
+      if (!role) {
+        return res.status(ResponseMessage.code.not_found).json({ error: true, message: ResponseMessage.fail.bad_request, data: {} });
+      }
+      const users = await role.getUsers();
+
+      return res.status(ResponseMessage.code.success).json({ error: false, message: ResponseMessage.pass.read, data: users });
+
+    } catch (error) {
+      console.error('Server Error:', error);
+      return res.status(ResponseMessage.code.server_error).json({ error: true, message: ResponseMessage.pass.server_error });
+    }
+
+  }
+
+
+  //========================/ GET ALL ROLE /======================
+
+  static getAllRoles = async (req, res) => {
+
+    try {
+      const roles = await Role.findAll();
+
+      if (!roles) {
+        return res.status(ResponseMessage.code.bad_request).json({ error: true, message: ResponseMessage.fail.bad_request, data: {} });
+      }
+
+      return res.status(ResponseMessage.code.success).json({ error: false, message: ResponseMessage.pass.read, data: roles });
+
+    } catch (error) {
+      console.error('Server Error:', error);
+      return res.status(ResponseMessage.code.server_error).json({ error: true, message: ResponseMessage.pass.server_error });
+    }
+
+  }
+
+
+
+  //=================================/ ADD ROLE TO USER || ADD USER TO ROLE /======================
+
+  static assignRoleToUser = async (req, res) => {
+
+    const {user_id, role_id} = req.body;
+
+    try {
+
+      const user = await User.findByPk(user_id);
+      const role = await Role.findByPk(role_id);
+
+      console.log(user);
+      console.log(role);
+
+      if (!user || !role) {
+        return res.status(ResponseMessage.code.bad_request).json({ error: true, message: ResponseMessage.fail.bad_request, data: {} });
+      }
+
+     const response =  await user.addRole(role);
+      // await role.addUser(user);
+
+      return res.status(ResponseMessage.code.success).json({ error: false, message: ResponseMessage.pass.create, data: response });
+
+    } catch (error) {
+      console.error('Server Error:', error);
+      return res.status(ResponseMessage.code.server_error).json({ error: true, message: ResponseMessage.pass.server_error });
+    }
+
+  }
+
+  // NOTE:
+
 
 
 
