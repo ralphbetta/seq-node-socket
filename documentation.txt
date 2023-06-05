@@ -1,12 +1,32 @@
-npm install express sequelize mysql2 cors dotenv express-validator jsonwebtoken bcrypt socket.io nodemailer --save
+// Setup
+npm init -y
+touch .env .env.example index.js
+mkdir src
+mkdir src/config src/controller src/middleware src/model src/routes src/server src/utils
 
+---------------------------------- For mongodb DB Service
+npm install express cors jsonwebtoken amqplib bcrypt mongoose dotenv mongodb-memory-server body-parser
+---------------------------------- For Sequelize DB Service
+npm install express sequelize mysql2 cors dotenv express-validator jsonwebtoken amqplib bcrypt nodemailer body-parser
+---------------------------------- For Optional
+npm i socket.io nodemailer --save
+>> npm i @treblle/express --save
 
 ### Here's an example of how you can create and run a migration using Sequelize CLI:
+
+If you have existing data in the table and you want to make the name field unique, you can follow these steps:
+
+Add a migration script to update the name field to be unique.
+Run the migration to apply the changes to the database.
+
 >> sudo npm install -g sequelize-cli
 >> sequelize migration:create --name=add_ip_address_column
 >> sequelize init
 >> sequelize db:migrate
+
 ----------------  TO SEED DATA    -----------------
 >> sequelize seed:generate --name=seed_column_data
 >> sequelize db:seed:all
->> node seeders/index.js
+
+---------------- TESTING ----------
+npm install axios mocha chai
