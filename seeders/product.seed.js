@@ -11,9 +11,9 @@ const seed = async () => {
   try {
     await Product.bulkCreate(products);
     console.log('Product seeded successfully!');
-  } catch (error) {
+  }  catch (error) {
     console.error('Error seeding database:', error);
-  } finally {
+  }finally {
     process.exit();
   }
 };
