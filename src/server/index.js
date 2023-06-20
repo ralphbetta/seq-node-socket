@@ -3,7 +3,8 @@ const cors = require("cors");
 require('dotenv').config();
 const app = express();
 const globalRoute = require('../routes/api.routes');
-const indexRoute = require('../routes/');
+const IndexRoute = require('../routes/');
+const SocketService = require("../utills/socket.service");
 
 
 class Server {
@@ -26,7 +27,6 @@ class Server {
         const { db } = require("../model/database/index");
 
         //Sync Database Models
-        //In development, you may need to drop existing tables and re-sync database. Just use
         //{ force: true }
         db.sequelize.sync()
             .then(() => {
@@ -36,26 +36,26 @@ class Server {
                 console.log("Failed to sync db: " + err.message);
             });
 
-
-        // simple route
-        app.get("/", (req, res) => {
-            res.json({ message: "Welcome to Node App" });
-        });
-
         
+        app.use('/Images', express.static('./Images'))
 
-        // Register App Routes
-        indexRoute(app).register();
 
+        /*----------- DEFAULT ROUTE ----------------*/
+        app.get("/", (req, res) => {res.json({ message: "Welcome to Node App" })});
+
+
+         /*----------- DEFAULT ROUTE ----------------*/
+        IndexRoute(app).register();
         // app.use('/api/', globalRoute);
 
-
-        // set port, listen for requests
         const PORT = process.env.PORT || 8080;
-        app.listen(PORT, () => {
-            console.log(`Server is running 127.0.0.1:${PORT}.`);
-        });
+        
+        const server = app.listen(PORT, () => {
+            console.log(`Server is running http://127.0.0.1:${PORT}`);
+           /*----------- SOCKET CONFIGURATION START ----------------*/
 
+           SocketService.initialize(server, app);
+        });
 
     }
 

@@ -8,11 +8,9 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.STRING,
             allowNull: false
         },
-        token: {
-            
-            type: Sequelize.STRING(255),
-            unique: true,
-            allowNull: false
+        token: {     
+            type: Sequelize.STRING(1000),
+       
         },
         expires_at: {
             type: Sequelize.DATE,
